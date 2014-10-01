@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+RUTA_PROYECTO = os.path.dirname(os.path.realpath(__file__))
 
 
 # Quick-start development settings - unsuitable for production
@@ -36,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'trivia.aplicaciones.sistema',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -66,7 +68,7 @@ DATABASES = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es'
 
 TIME_ZONE = 'UTC'
 
@@ -81,3 +83,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+MEDIA_URL="/media/"
+MEDIA_ROOT=os.path.join(RUTA_PROYECTO,"media")
+TEMPLATE_DIRS=(os.path.join(RUTA_PROYECTO,"plantillas"),)
+STATICFILES_DIRS=(os.path.join(RUTA_PROYECTO,"static"),)
