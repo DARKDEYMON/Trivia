@@ -1,0 +1,17 @@
+form{
+	width: 30%;
+  	top: 45%; 
+  	left: 50%;
+  	transform: translate(-55%, -50%);
+	/*margin: auto;*/
+	position: absolute;
+}
+table{
+	background: #B3B3B3;
+	margin: auto;
+	width: 30%;
+	border-radius: 5px; 
+}
+input{
+	margin: auto;
+}
