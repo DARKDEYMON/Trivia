@@ -10,6 +10,7 @@ class form_usuario_for_admin(ModelForm):
 class form_usuario_for_final_user(ModelForm):
 	class Meta:
 		model=usuario
+		fields = ['username','password','imagen','correo']
 		widgets = {
         	'password': PasswordInput(),
         }
