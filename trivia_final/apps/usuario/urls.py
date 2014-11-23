@@ -9,4 +9,8 @@ urlpatterns = patterns('',
     url(r'^login/', login_view, name="login"),
     url(r'^logout/', logout_view, name="logout"),
     url(r'^actualisar/', actualisar_perfil_view, name="actualisar"),
+    url(r'^tema/', temas_view, name="tema"),
+    url(r'^crear_pregunta/', preguntas_view, name="preguntas"),
+    url(r'^crear_respuestas/', respuestas_view, name="respuestas"),
+    (r'^(?P<id>.+?)/$', lista_preguntas_view),
 )

@@ -14,7 +14,18 @@ class formulario_de_perfil(ModelForm):
 	class Meta:
 		model=datos_adicionales_usuario
 		exclude=['username']
-
+class formulario_temas(ModelForm):
+	class Meta:
+		model=temas
+		exclude=['username']
+class formulario_preguntas(ModelForm):
+	class Meta:
+		model=preguntas
+		exclude=['username']
+class formulario_respuestas(ModelForm):
+	class Meta:
+		model=respuestas
+		exclude=['username']
 class formulario_usuario_registro(UserCreationForm):
 	username=forms.CharField(max_length=40,required=True,help_text=False,label="Nick")
 	password2=forms.CharField(help_text=False,label="Contraseña de confirmación", widget=forms.PasswordInput)

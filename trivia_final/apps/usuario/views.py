@@ -1,6 +1,6 @@
 from django.shortcuts import render,render_to_response
 from django.template import RequestContext
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse,Http404
 from form import *
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login , authenticate , logout
@@ -8,7 +8,61 @@ from django.contrib.auth.models import User
 from models import *
 import pdb
 # Create your views here.
-
+def lista_preguntas_view(request,id):
+	if request.user.is_authenticated():
+		aux=preguntas.objects.filter(id=id)
+		if len(aux)!=0:
+			return render_to_response("sistema/edicionpreguntas.html",{"pregunta":aux[0]},context_instance=RequestContext(request))
+		else:
+			raise Http404("page no exist")
+	else:
+		return HttpResponse("no esta logeado")
+def respuestas_view(request):
+	if request.user.is_authenticated():
+		usuario=request.user
+		if request.method=="POST":
+			auxform=formulario_respuestas(request.POST)
+			if auxform.is_valid():
+				post=auxform.save(commit=False)
+				post.username=usuario
+				post.save()
+		else:
+			auxform=formulario_respuestas()
+		return render_to_response("sistema/respuestas.html",{"form_respuesta":auxform},context_instance=RequestContext(request))
+	else:
+		return HttpResponse("no esta logeado")
+def preguntas_view(request):
+	if request.user.is_authenticated():
+		usuario=request.user
+		if request.method=="POST":
+			auxform=formulario_preguntas(request.POST)
+			if auxform.is_valid():
+				post= auxform.save(commit=False)
+				post.username=usuario
+				post.save()
+				return HttpResponseRedirect("/")
+		else:
+			auxform=formulario_preguntas()
+		return render_to_response("sistema/preguntas.html",{"form_pregunta":auxform},context_instance=RequestContext(request))
+	else:
+		return HttpResponse("no esta logeado")
+def temas_view(request):
+	if request.user.is_authenticated():
+		usuario=request.user
+		if  request.method=="POST":
+			auxform=formulario_temas(request.POST)
+			#datouser=User.objects.get(username=usuario)
+			if auxform.is_valid():
+				#pdb.set_trace()
+				post = auxform.save(commit=False)
+		        post.username = usuario
+		        post.save()
+		        return HttpResponseRedirect("/")
+		else:
+			auxform=formulario_temas()
+		return render_to_response("sistema/temas.html",{"form_tema":auxform},context_instance=RequestContext(request))
+	else:
+		return HttpResponse("no esta logeado")
 def registro_view(request):
 	if request.method=="POST":
 		auxform=formulario_usuario_registro(request.POST)
