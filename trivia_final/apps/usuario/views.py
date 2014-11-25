@@ -8,11 +8,22 @@ from django.contrib.auth.models import User
 from models import *
 import pdb
 # Create your views here.
-def lista_preguntas_view(request,id):
+def lista_preguntas_view(request):
+	if request.user.is_authenticated():
+		aux=preguntas.objects.filter()
+		#pdb.set_trace()
+		if len(aux)!=0:
+			return render_to_response("sistema/lista_preguntas.html",{"preguntas":aux},context_instance=RequestContext(request))
+		else:
+			raise Http404("page no exist")
+	else:
+		return HttpResponse("no esta logeado")
+def lista_preguntas_eliminar_view(request,id):
 	if request.user.is_authenticated():
 		aux=preguntas.objects.filter(id=id)
 		if len(aux)!=0:
-			return render_to_response("sistema/edicionpreguntas.html",{"pregunta":aux[0]},context_instance=RequestContext(request))
+			preguntas.objects.get(id=id).delete()
+			return render_to_response("sistema/eliminar_preguntas.html",{"pregunta":aux[0]},context_instance=RequestContext(request))
 		else:
 			raise Http404("page no exist")
 	else:
@@ -26,6 +37,12 @@ def respuestas_view(request):
 				post=auxform.save(commit=False)
 				post.username=usuario
 				post.save()
+				#pdb.set_trace()
+				t1=request.POST['preguntas']
+				t2 = preguntas.objects.get(id=t1)
+				t2.lista=True
+				t2.save()
+				return HttpResponseRedirect("/")
 		else:
 			auxform=formulario_respuestas()
 		return render_to_response("sistema/respuestas.html",{"form_respuesta":auxform},context_instance=RequestContext(request))
@@ -37,9 +54,11 @@ def preguntas_view(request):
 		if request.method=="POST":
 			auxform=formulario_preguntas(request.POST)
 			if auxform.is_valid():
+				#pdb.set_trace()
 				post= auxform.save(commit=False)
 				post.username=usuario
 				post.save()
+				auxform.save_m2m()
 				return HttpResponseRedirect("/")
 		else:
 			auxform=formulario_preguntas()
