@@ -69,6 +69,19 @@ app.use(function(err, req, res, next) {
     });
 });
 
+//aqui empiesa todo
+var mysql=require("./db/mysql");
+var query=new mysql({
+    host     : 'localhost',
+    user     : 'root',
+    password : '123456789',
+    port     : '3305',
+    database : 'trivia'
+});
+
+
+var session=require("./session/django");
+var s=session();
 
 module.exports = app;
 
@@ -92,6 +105,53 @@ sockets.on('connection',  function(socket) {
     socket.on('test', function(data) {
         //console.log(socket.handshake);
         socket.emit("test",{"conectado":"coneccion exitosa!!!"});
+        return;
+    });
+    socket.on('sala_juego', function(data) {
+        console.log(data.sala+"   sala socket  " +data.sessionid);
+        s.getSession(data.sessionid,function(s){
+            if(s===false)
+              return;
+            if(s.estado=="conectado")
+            {
+              query.get("usuario_partida").where({id:data.sala}).execute(function(rows){
+                  maximo_de_jugadores=rows[0].max_jugadores;
+                  query.get("usuario_jugadores_en_partida").where({partida_id:data.sala}).execute(function(rows1){
+                    if(rows1.length<maximo_de_jugadores)
+                    {
+                        query.get("auth_user").where({username:s.name}).execute(function(rows){
+                            id_us=rows[0].id;
+                            query.delete("usuario_jugadores_en_partida").where({user_id:id_us}).execute(function(l){//borra todo antes de meter un usuario
+                            });
+                            query.save("usuario_jugadores_en_partida",{partida_id:data.sala,user_id:id_us},function(r){
+                                socket.salas=data.sala;
+                                socket.join(data.sala);
+
+                                console.log("idsala: "+data.sala+" id_us:"+id_us);
+                            });
+                        });
+                    }
+                    else
+                    {
+                      return;//aqui si no hay espacio
+                    }
+                  });
+              });
+              
+            }
+        });
+        return;
+    });
+    socket.on('mensajes', function(data) {
+        //console.log(data.sala+"   sala socket  " +data.sessionid);
+        console.log(data.msn+"  mensaje");
+        s.getSession(data.sessionid,function(s){
+            if(s.estado=="conectado")
+            {
+              console.log(data.msn+"  mensaje  " +s.name);
+              sockets.to(socket.salas).emit("mensajes",{"msn":data.msn,"nick":s.name});
+            }
+        });
         return;
     });
 });
